@@ -1,35 +1,20 @@
+---
+author: "Kyle Jones"
+date_published: "July 14, 2025"
+date_exported_from_medium: "November 10, 2025"
+canonical_link: "https://medium.com/@kyle-t-jones/crude-pipeline-blending-optimization-with-pyomo-d7f6c725f594"
+---
+
 # Crude Pipeline Blending Optimization with Pyomo Blending crude oil is not a guessing game. Midstream companies do it to
 meet contractual specs and maximize margin. Each barrel blended...
 
 ### Crude Pipeline Blending Optimization with Pyomo
-Blending crude oil is not a guessing game. Midstream companies do it to
-meet contractual specs and maximize margin. Each barrel blended below
-spec costs money. Each unnecessary premium barrel blended in gives away
-value. A well-built optimization model ensures the right blend goes into
-the pipe every day.
+Blending crude oil is not a guessing game. Midstream companies do it to meet contractual specs and maximize margin. Each barrel blended below spec costs money. Each unnecessary premium barrel blended in gives away value. A well-built optimization model ensures the right blend goes into the pipe every day.
 
-
-<figcaption>Photo by <a
-href="https://unsplash.com/@scentspiracy?utm_source=medium&amp;utm_medium=referral"
-class="markup--anchor markup--figure-anchor"
-data-href="https://unsplash.com/@scentspiracy?utm_source=medium&amp;utm_medium=referral"
-rel="photo-creator noopener" target="_blank">Fulvio Ciccolo</a> on <a
-href="https://unsplash.com?utm_source=medium&amp;utm_medium=referral"
-class="markup--anchor markup--figure-anchor"
-data-href="https://unsplash.com?utm_source=medium&amp;utm_medium=referral"
-rel="photo-source noopener" target="_blank">Unsplash</a></figcaption>
-
-
-This article walks through a working example of crude blending using
-Pyomo in Python. We use API gravity and sulfur as constraints. The goal
-is to minimize cost while meeting product specs. No proprietary data. No
-black boxes. Everything runs locally and transparently.
+This article walks through a working example of crude blending using Pyomo in Python. We use API gravity and sulfur as constraints. The goal is to minimize cost while meeting product specs. No proprietary data. No black boxes. Everything runs locally and transparently.
 
 ### The Problem
-You manage a tank farm with multiple crude streams. Incoming deliveries
-vary each week. Your customers expect output that meets a minimum API
-gravity and a maximum sulfur level. You want to mix available barrels to
-meet that spec at the lowest cost.
+You manage a tank farm with multiple crude streams. Incoming deliveries vary each week. Your customers expect output that meets a minimum API gravity and a maximum sulfur level. You want to mix available barrels to meet that spec at the lowest cost.
 
 You know:
 
@@ -40,14 +25,10 @@ You know:
 You want to find the optimal volume of each crude to blend.
 
 ### Why Pyomo
-Pyomo is a Python-based modeling language for optimization problems. It
-supports linear, nonlinear, and mixed-integer formulations. It runs with
-open-source solvers like GLPK and CBC. It allows constraints to be
-expressed symbolically and solved with minimal boilerplate.
+Pyomo is a Python-based modeling language for optimization problems. It supports linear, nonlinear, and mixed-integer formulations. It runs with open-source solvers like GLPK and CBC. It allows constraints to be expressed symbolically and solved with minimal boilerplate.
 
 ### Define the Data
 Assume we have three crude types with these characteristics.
-
 
 We want to blend 6000 barrels that meet
 
@@ -57,14 +38,11 @@ We want to blend 6000 barrels that meet
 This is a constrained optimization problem.
 
 ### Build the Model
-The model chooses how much of each crude to blend. The objective is to
-minimize cost. Constraints ensure the total volume hits 6000 bbl, API
-stays above 35, sulfur stays below 1.0%, and no crude is overdrawn.
+The model chooses how much of each crude to blend. The objective is to minimize cost. Constraints ensure the total volume hits 6000 bbl, API stays above 35, sulfur stays below 1.0%, and no crude is overdrawn.
 
 Here's the complete code:
 
-If you have never run pyomo, you need to install it plus the GLPK solver
-pack.
+If you have never run pyomo, you need to install it plus the GLPK solver pack.
 
 ``` 
 !pip install pyomo
@@ -112,9 +90,7 @@ else:
 ```
 
 ### Results
-This runs fast. It returns the exact number of barrels to pull from each
-tank. It also shows the total cost, API, and sulfur. You can change the
-input specs, rerun the model, and re-optimize.
+This runs fast. It returns the exact number of barrels to pull from each tank. It also shows the total cost, API, and sulfur. You can change the input specs, rerun the model, and re-optimize.
 
 The output might look like this:
 
@@ -137,29 +113,18 @@ This is only the start. You can extend the model to:
 - Use real-time SCADA or terminal feedstock data
 
 ### What This Solves
-Midstream blending matters. Getting it right means better product value,
-fewer off-spec penalties, and better margin control. A model like this,
-even in simple form, can save hundreds of thousands per year.
+Midstream blending matters. Getting it right means better product value, fewer off-spec penalties, and better margin control. A model like this, even in simple form, can save hundreds of thousands per year.
 
-You do not need a digital twin. You need a working model, tied to your
-actual feedstock and specs, and running every day.
+You do not need a digital twin. You need a working model, tied to your actual feedstock and specs, and running every day.
 
-We can look at some alternative blending options. This graph shows
-different cut points and the relative costs at that top. Each od these
-blends eets the 6KBD requirement. But these do not all meet the
-rewuiqrments for API and Sulphur content.
+We can look at some alternative blending options. This graph shows different cut points and the relative costs at that top. Each od these blends eets the 6KBD requirement. But these do not all meet the rewuiqrments for API and Sulphur content.
 
-
-This small list shows us mixes that satisfy the API and suphlur
-constraints but these are more expensive. So the "official" mix on the
-upper graph is the winner.
-
+This small list shows us mixes that satisfy the API and suphlur constraints but these are more expensive. So the "official" mix on the upper graph is the winner.
 
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
 import numpy as np
-
 
 # Define alternative blend scenarios
 scenarios = {
@@ -263,10 +228,3 @@ plt.tight_layout()
 plt.savefig('valid_blends_only.png')
 plt.show()
 ```
-::::::::By [Kyle Jones](https://medium.com/@kyle-t-jones) on
-[July 14, 2025](https://medium.com/p/d7f6c725f594).
-
-[Canonical
-link](https://medium.com/@kyle-t-jones/crude-pipeline-blending-optimization-with-pyomo-d7f6c725f594)
-
-Exported from [Medium](https://medium.com) on November 10, 2025.
