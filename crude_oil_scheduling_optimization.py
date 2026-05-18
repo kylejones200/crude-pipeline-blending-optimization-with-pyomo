@@ -12,19 +12,15 @@ from pyoptinterface import highs
 
 def time_index_relative_to_today() -> None:
     months = ["M+3", "M+4"]
-
     tanks = ["light", "medium", "heavy"]
-
-    capacity = pd.Series({"light": 80000, "medium": 120000, "heavy": 100000})
-
-    demand = pd.DataFrame(
+    pd.Series({"light": 80000, "medium": 120000, "heavy": 100000})
+    pd.DataFrame(
         {
             "tank": np.repeat(tanks, len(months)),
             "month": months * len(tanks),
             "barrels": [50000, 55000, 70000, 65000, 60000, 60000],
         }
     )
-
     sources = pd.DataFrame(
         {
             "source": ["foreign", "canada", "domestic"],
@@ -34,8 +30,7 @@ def time_index_relative_to_today() -> None:
             "max_M+4": [120000, 90000, 80000],
         }
     )
-
-    mix = pd.DataFrame(
+    pd.DataFrame(
         {
             "source": [
                 "foreign",
@@ -52,47 +47,37 @@ def time_index_relative_to_today() -> None:
             "frac": [0.1, 0.3, 0.6, 0.2, 0.5, 0.3, 0.5, 0.35, 0.15],
         }
     )
-
-    grid = (
+    (
         sources.assign(key=1)
         .merge(pd.DataFrame({"month": months, "key": 1}), on="key")
         .drop(columns="key")
     )
-
-    init_inv = pd.Series({"light": 10000, "medium": 20000, "heavy": 15000})
+    pd.Series({"light": 10000, "medium": 20000, "heavy": 15000})
 
 
 def demand_wide() -> None:
-    dem = demand.pivot(index="tank", columns="month", values="barrels").fillna(0)
-
-    R = (
+    demand.pivot(index="tank", columns="month", values="barrels").fillna(0)
+    (
         mix.pivot(index="source", columns="tank", values="frac")
         .reindex(index=sources["source"])
         .fillna(0)
     )
-
-    c = sources.set_index("source")["cost"]
-
-    smax = sources.set_index("source")[["max_M+3", "max_M+4"]].rename(
+    sources.set_index("source")["cost"]
+    sources.set_index("source")[["max_M+3", "max_M+4"]].rename(
         columns={"max_M+3": "M+3", "max_M+4": "M+4"}
     )
 
 
 def decision_variables_orders_placed_today_per_sourc() -> None:
     m = pf.Model(solver="highs")
-
     m.Order = pf.Variable(grid[["source", "month"]], lb=0)
-
-    orders_tbl = (
+    (
         grid.pivot(index="source", columns="month", values="lead")
         .reset_index()[["source", "M+3"]]
         .drop(columns="M+3")
     )
-
-    orders_tbl = grid[["source", "month"]].drop_duplicates()
-
+    grid[["source", "month"]].drop_duplicates()
     arrivals = {}
-
     for mo in months:
         O_mo = pf.slice(m.Order, {"month": mo})
         arrivals[mo] = (
@@ -119,7 +104,6 @@ def decision_variables_orders_placed_today_per_sourc() -> None:
             expr=lambda df: df["cost"] * m.Order
         )[["expr"]]
     )
-
     for t in tanks:
         for mo in months:
             coeff = R[t].rename("coef").reset_index().assign(month=mo)
@@ -138,27 +122,19 @@ def decision_variables_orders_placed_today_per_sourc() -> None:
             )
 
     m.optimize()
-
     orders_solution = m.Order.solution.to_pandas().rename(
         columns={"solution": "barrels"}
     )
-
     print(orders_solution)
 
 
 def index_maps() -> None:
     mdl = Model(sense=minimize, solver_name=CBC)
-
     S = list(sources["source"])
-
     M = months
-
     T = tanks
-
     Order = {(s, mo): mdl.add_var(lb=0, name=f"Order[{s},{mo}]") for s in S for mo in M}
-
     mdl.objective = xsum((c.loc[s] * Order[s, mo] for s in S for mo in M))
-
     for t in T:
         for mo in M:
             arrivals = xsum((R.loc[s, t] * Order[s, mo] for s in S))
@@ -171,27 +147,20 @@ def index_maps() -> None:
             mdl += (Order[s, mo] <= float(smax.loc[s, mo]), f"max_{s}_{mo}")
 
     mdl.optimize()
-
     orders_mip = []
-
     for s in S:
         for mo in M:
             orders_mip.append({"source": s, "month": mo, "barrels": Order[s, mo].x})
 
     orders_mip = pd.DataFrame(orders_mip)
-
     print(orders_mip)
 
 
 def maps() -> None:
     model = highs.Model()
-
     S = list(sources["source"])
-
     M = months
-
     T = tanks
-
     Order = {
         (s, mo): model.add_variable(
             lb=0, ub=None, domain=poi.VariableDomain.Continuous, name=f"Order[{s},{mo}]"
@@ -199,15 +168,12 @@ def maps() -> None:
         for s in S
         for mo in M
     }
-
     obj = 0.0
-
     for s in S:
         for mo in M:
             obj = obj + float(c.loc[s]) * Order[s, mo]
 
     model.set_objective(obj, poi.ObjectiveSense.Minimize)
-
     for t in T:
         for mo in M:
             expr = 0.0
@@ -226,11 +192,8 @@ def maps() -> None:
             )
 
     model.set_model_attribute(poi.ModelAttribute.Silent, False)
-
     model.optimize()
-
     orders_poi = []
-
     for s in S:
         for mo in M:
             orders_poi.append(
@@ -238,19 +201,14 @@ def maps() -> None:
             )
 
     orders_poi = pd.DataFrame(orders_poi)
-
     print(orders_poi)
 
 
 def config() -> None:
     months = ["M+3", "M+4"]
-
     tanks = ["light", "medium", "heavy"]
-
     capacity = pd.Series({"light": 80000, "medium": 120000, "heavy": 100000})
-
     init_inv = pd.Series({"light": 10000, "medium": 20000, "heavy": 15000})
-
     demand = pd.DataFrame(
         {
             "tank": np.repeat(tanks, len(months)),
@@ -258,7 +216,6 @@ def config() -> None:
             "barrels": [50000, 55000, 70000, 65000, 60000, 60000],
         }
     )
-
     sources = pd.DataFrame(
         {
             "source": ["foreign", "canada", "domestic"],
@@ -268,7 +225,6 @@ def config() -> None:
             "max_M+4": [120000, 90000, 80000],
         }
     )
-
     mix = pd.DataFrame(
         {
             "source": [
@@ -286,33 +242,22 @@ def config() -> None:
             "frac": [0.1, 0.3, 0.6, 0.2, 0.5, 0.3, 0.5, 0.35, 0.15],
         }
     )
-
     dem = demand.pivot(index="tank", columns="month", values="barrels").fillna(0)
-
     R = (
         mix.pivot(index="source", columns="tank", values="frac")
         .reindex(sources["source"])
         .fillna(0)
     )
-
     c_tbl = sources[["source", "cost"]]
-
     smax = sources.set_index("source")[["max_M+3", "max_M+4"]].rename(
         columns={"max_M+3": "M+3", "max_M+4": "M+4"}
     )
-
     m = pf.Model(solver="highs")
-
     m.Order_M3 = pf.Variable(sources[["source"]], lb=0)
-
     m.Order_M4 = pf.Variable(sources[["source"]], lb=0)
-
     obj_M3 = pf.sum(over=c_tbl, expr=c_tbl["cost"] * m.Order_M3)
-
     obj_M4 = pf.sum(over=c_tbl, expr=c_tbl["cost"] * m.Order_M4)
-
     m.minimize = obj_M3 + obj_M4
-
     for t in tanks:
         coef_tbl = R[t].rename("coef").reset_index()
         arr_M3 = pf.sum(over=coef_tbl, expr=coef_tbl["coef"] * m.Order_M3)
@@ -335,33 +280,25 @@ def config() -> None:
         )
 
     m.optimize()
-
     sol_M3 = (
         m.Order_M3.solution.to_pandas()
         .rename(columns={"solution": "barrels"})
         .assign(month="M+3")
     )
-
     sol_M4 = (
         m.Order_M4.solution.to_pandas()
         .rename(columns={"solution": "barrels"})
         .assign(month="M+4")
     )
-
     orders = pd.concat([sol_M3, sol_M4], ignore_index=True)
-
     print(orders)
 
 
 def objective() -> None:
     cost_s = c_tbl.set_index("source")["cost"]
-
     obj_M3 = pf.sum(over=["source"], expr=cost_s * m.Order_M3)
-
     obj_M4 = pf.sum(over=["source"], expr=cost_s * m.Order_M4)
-
     m.minimize = obj_M3 + obj_M4
-
     for t in tanks:
         coef_s = R[t]
         arr_M3 = pf.sum(over=["source"], expr=coef_s * m.Order_M3)
@@ -376,13 +313,9 @@ def objective() -> None:
 
 def notebook_step_010() -> None:
     months = ["M+3", "M+4"]
-
     tanks = ["light", "medium", "heavy"]
-
     capacity = pd.Series({"light": 80000, "medium": 120000, "heavy": 100000})
-
     init_inv = pd.Series({"light": 10000, "medium": 20000, "heavy": 15000})
-
     demand = pd.DataFrame(
         {
             "tank": np.repeat(tanks, len(months)),
@@ -390,7 +323,6 @@ def notebook_step_010() -> None:
             "barrels": [50000, 55000, 70000, 65000, 60000, 60000],
         }
     )
-
     sources = pd.DataFrame(
         {
             "source": ["foreign", "canada", "domestic"],
@@ -400,7 +332,6 @@ def notebook_step_010() -> None:
             "max_M+4": [120000, 90000, 80000],
         }
     )
-
     mix = pd.DataFrame(
         {
             "source": [
@@ -418,33 +349,22 @@ def notebook_step_010() -> None:
             "frac": [0.1, 0.3, 0.6, 0.2, 0.5, 0.3, 0.5, 0.35, 0.15],
         }
     )
-
     dem = demand.pivot(index="tank", columns="month", values="barrels").fillna(0)
-
     R = (
         mix.pivot(index="source", columns="tank", values="frac")
         .reindex(sources["source"])
         .fillna(0)
     )
-
     cost_s = sources.set_index("source")["cost"]
-
     smax = sources.set_index("source")[["max_M+3", "max_M+4"]].rename(
         columns={"max_M+3": "M+3", "max_M+4": "M+4"}
     )
-
     m = pf.Model(solver="highs")
-
     m.Order_M3 = pf.Variable(sources[["source"]], lb=0)
-
     m.Order_M4 = pf.Variable(sources[["source"]], lb=0)
-
     obj_M3 = pf.sum(over=["source"], expr=cost_s * m.Order_M3)
-
     obj_M4 = pf.sum(over=["source"], expr=cost_s * m.Order_M4)
-
     m.minimize = obj_M3 + obj_M4
-
     for t in tanks:
         coef_s = R[t]
         arr_M3 = pf.sum(over=["source"], expr=coef_s * m.Order_M3)
@@ -465,37 +385,27 @@ def notebook_step_010() -> None:
         )
 
     m.optimize()
-
     sol_M3 = (
         m.Order_M3.solution.to_pandas()
         .rename(columns={"solution": "barrels"})
         .assign(month="M+3")
     )
-
     sol_M4 = (
         m.Order_M4.solution.to_pandas()
         .rename(columns={"solution": "barrels"})
         .assign(month="M+4")
     )
-
     orders = pd.concat([sol_M3, sol_M4], ignore_index=True)
-
     print(orders)
 
 
 def everything_above_unchanged() -> None:
     m = pf.Model(solver="highs")
-
     m.Order_M3 = pf.Variable(sources[["source"]], lb=0)
-
     m.Order_M4 = pf.Variable(sources[["source"]], lb=0)
-
     obj_M3 = pf.sum(over=["source"], expr=cost_s * m.Order_M3)
-
     obj_M4 = pf.sum(over=["source"], expr=cost_s * m.Order_M4)
-
     m.minimize = obj_M3 + obj_M4
-
     for t in tanks:
         coef_s = R[t]
         arr_M3 = pf.sum(over=["source"], expr=coef_s * m.Order_M3)
@@ -508,25 +418,19 @@ def everything_above_unchanged() -> None:
         setattr(m, f"cap_{t}_M4", end_M4 <= float(capacity[t]))
 
     m.max_M3 = m.Order_M3 <= smax["M+3"]
-
     m.max_M4 = m.Order_M4 <= smax["M+4"]
-
     m.optimize()
-
     sol_M3 = (
         m.Order_M3.solution.to_pandas()
         .rename(columns={"solution": "barrels"})
         .assign(month="M+3")
     )
-
     sol_M4 = (
         m.Order_M4.solution.to_pandas()
         .rename(columns={"solution": "barrels"})
         .assign(month="M+4")
     )
-
     orders = pd.concat([sol_M3, sol_M4], ignore_index=True)
-
     print(orders)
 
 

@@ -3,9 +3,15 @@ name = "crude-pipeline-blending-optimization-with-pyomo"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
+    "pydantic>=2.10.0",
+    "pytest>=8.0",
     "mip>=1.17.6",
     "numpy>=2.4.4",
     "pandas>=3.0.3",
     "pyoframe>=1.0.0",
     "pyoptinterface>=0.5.1",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

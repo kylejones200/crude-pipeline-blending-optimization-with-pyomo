@@ -14,7 +14,6 @@ def main() -> None:
     sulfur = {"A": 1.2, "B": 0.5, "C": 2.0}
     avail = {"A": 5000, "B": 3000, "C": 4000}
     target_volume = 6000
-
     model = pyo.ConcreteModel()
     model.crudes = pyo.Set(initialize=crudes)
     model.vol = pyo.Var(model.crudes, domain=pyo.NonNegativeReals)
@@ -30,7 +29,6 @@ def main() -> None:
     model.api = pyo.Constraint(
         expr=sum(model.vol[c] * api[c] for c in model.crudes) >= target_volume * 35
     )
-
     model.avail = pyo.Constraint(
         model.crudes, rule=lambda m, c, avail=avail: avail_rule(m, c, avail)
     )
