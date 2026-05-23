@@ -1,0 +1,15 @@
+[package]
+name = "crude_pipeline_blending_optimization_with_pyomo_rs"
+description = "Python bindings (PyO3) for crude_pipeline_blending_optimization_with_pyomo_core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "crude_pipeline_blending_optimization_with_pyomo_rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+crude_pipeline_blending_optimization_with_pyomo_core = { path = "../core" }
+pyo3 = { version = "0.28", features = ["extension-module"] }
+numpy = "0.28"

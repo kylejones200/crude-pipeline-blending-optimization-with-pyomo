@@ -1,0 +1,9 @@
+[package]
+name = "crude_pipeline_blending_optimization_with_pyomo_core"
+description = "Blend cost evaluation with constraint checks"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+path = "src/lib.rs"

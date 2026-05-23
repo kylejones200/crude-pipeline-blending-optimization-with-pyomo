@@ -1,0 +1,13 @@
+[package]
+name = "crude_pipeline_blending_optimization_with_pyomo_bench"
+description = "Standalone Rust benchmark (no Python)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "bench"
+path = "src/main.rs"
+
+[dependencies]
+crude_pipeline_blending_optimization_with_pyomo_core = { path = "../core" }
