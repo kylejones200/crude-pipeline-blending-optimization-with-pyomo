@@ -11,14 +11,7 @@ This article walks through a working example of crude blending using Pyomo in Py
 
 You manage a tank farm with multiple crude streams. Incoming deliveries vary each week. Your customers expect output that meets a minimum API gravity and a maximum sulfur level. You want to mix available barrels to meet that spec at the lowest cost.
 
-## About
 
-Place the code for this article in this repository.
-The original article export is saved as `article.md`.
-
-## Files
-
-Add your `.ipynb`, `.py`, `.yaml`, `.js`, `.ts`, or other project files here.
 
 ## Rust performance port
 
